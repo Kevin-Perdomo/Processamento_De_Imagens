@@ -76,7 +76,7 @@ java --version
 
 ## Uso
 
-1. **Importante**: Os nomes dos plugins precisam, obrigatoriamente, ter um caractere underscore para que o ImageJ assim os reconheça. Exemplo: no ImageJ, o plugin "Open" está associado ao comando "Open_", o que é o suficiente para que o ImageJ reconhecça este plugin. 
+1. **Importante**: Os nomes dos plugins precisam, obrigatoriamente, ter um caractere underscore para que o ImageJ assim os reconheça. Exemplo: no ImageJ, o plugin "Open" está associado ao comando "Open_", o que é o suficiente para que o ImageJ reconheça este plugin. 
 
 2. **Compile o projeto**:
    ```bash  
