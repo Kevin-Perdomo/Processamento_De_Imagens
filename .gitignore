@@ -1,5 +1,5 @@
-/build
-/plugins
+/build/
+/plugins/
 **/build/*
 **/plugins/*
 **/ij.jar
