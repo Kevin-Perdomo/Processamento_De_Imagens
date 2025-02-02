@@ -1,0 +1,6 @@
+cd /Users/wayne/Git/imagej
+rm -rf ij
+cp -r /Users/wayne/ImageJ/source/ij .
+cp /Users/wayne/ImageJ/source/IJ_Props.txt .
+cp /Users/wayne/ImageJ/source/release-notes.html .
+cp /Users/wayne/ImageJ/source/functions.html .
