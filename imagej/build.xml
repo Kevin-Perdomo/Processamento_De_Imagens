@@ -14,12 +14,12 @@
     <!-- First, ensure the build directory exists. -->
     <mkdir dir="${build.dir}" />
     <!-- Build everything; add debug="on" to debug -->
-    <javac srcdir="./ij" destdir="${build.dir}" optimize="on" source="1.8" target="1.8" debug="on" includeantruntime="false" encoding="utf-8">
+    <javac srcdir="./ij" destdir="${build.dir}" optimize="on" source="8" target="8" debug="on" includeantruntime="false" encoding="utf-8">
     </javac>
   </target>
 
   <target name="compile-plugins" depends="compile" description="compile-plugins">
-    <javac srcdir="./customPlugins" destdir="./plugins" optimize="on" source="1.8" target="1.8" debug="on" includeantruntime="false" encoding="utf-8">
+    <javac srcdir="./customPlugins" destdir="./plugins" optimize="on" source="8" target="8" debug="on" includeantruntime="false" encoding="utf-8">
       <classpath>
         <pathelement path="${build.dir}" />
       </classpath>
@@ -105,7 +105,7 @@
       <fileset dir="${build-tests-lib.dir}" includes="*.jar" />
     </path>
     <javac srcdir="${src-tests.dir}" destdir="${build-tests.dir}" classpathref="compile-tests.classpath"
-           optimize="on" source="1.8" target="1.8" debug="on" includeantruntime="false" encoding="utf-8"
+           optimize="on" source="8" target="8" debug="on" includeantruntime="false" encoding="utf-8"
            excludes="data/**" />
   </target>
 
