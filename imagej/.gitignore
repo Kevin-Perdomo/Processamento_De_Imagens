@@ -1,3 +1,5 @@
 build/
 plugins/
-**/ij.jar
+info/
+*/ij.jar
+*ij.jar
