@@ -1,6 +1,7 @@
 */imagej/build
 */imagej/plugins
-**/build
+**/build/
+**/plugins/
 **/plugins
 **/ij.jar
 *ij.jar
