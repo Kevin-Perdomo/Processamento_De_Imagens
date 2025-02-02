@@ -1,5 +1,5 @@
 import ij.IJ;
-import ij.plugin.PlugIn;import ij.plugin.PlugIn;
+import ij.plugin.PlugIn;
 
 public class HelloWorld_ implements PlugIn {
    public HelloWorld_() {
