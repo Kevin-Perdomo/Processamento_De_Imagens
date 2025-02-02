@@ -1,5 +1,4 @@
-/build/
-/plugins/
-/info/
+**/build
+**/plugins
 **/ij.jar
 *ij.jar
