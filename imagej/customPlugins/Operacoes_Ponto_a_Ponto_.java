@@ -47,25 +47,35 @@ public class Operacoes_Ponto_a_Ponto_ implements PlugIn, DialogListener {
 	
 	@Override
 	public boolean dialogItemChanged(GenericDialog interfaceGrafica, AWTEvent e) {
-		if (interfaceGrafica.wasCanceled()) return false;		
+
+		if (interfaceGrafica.wasCanceled()) 
+		return false;		
 		processarImagem(interfaceGrafica);
-        return true;	
+        return true;
+			
 	}
 	
 	public void processarImagem(GenericDialog interfaceGrafica){
-		int idImagens[] = WindowManager.getIDList();
-		ImagePlus imagem = WindowManager.getImage(idImagens[0]), novaImagem = WindowManager.getImage(idImagens[1]);
-		ImageProcessor processador = imagem.getProcessor(), novoProcessador = novaImagem.getProcessor();
 
-		int brilho = (int)interfaceGrafica.getNextNumber(), contraste = (int)interfaceGrafica.getNextNumber(),
-		solarizacao = (int)interfaceGrafica.getNextNumber(), largura_imagem = imagem.getWidth(), 
-		altura_imagem = imagem.getHeight(), media;
+		int idImagens[] = WindowManager.getIDList();
+
+		ImagePlus imagem = WindowManager.getImage(idImagens[0]), 
+		          novaImagem = WindowManager.getImage(idImagens[1]);
+
+		ImageProcessor processador = imagem.getProcessor(), 
+		               novoProcessador = novaImagem.getProcessor();
+
+		int brilho = (int)interfaceGrafica.getNextNumber(),
+		    contraste = (int)interfaceGrafica.getNextNumber(),
+		    solarizacao = (int)interfaceGrafica.getNextNumber(), largura_imagem = imagem.getWidth(), 
+		    altura_imagem = imagem.getHeight(), 
+		    media;
 		
 		int valorPixel[] = {0,0,0}, novoValorPixel[] = {0,0,0};
 		
 		Double saturacao = interfaceGrafica.getNextNumber();
+
 		float fatorC = fatorContraste(contraste);
-		
 		
 		for (int x = 0; x < largura_imagem; x++) {	
 			for (int y = 0; y < altura_imagem; y++) {
