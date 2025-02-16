@@ -139,5 +139,4 @@ public class Operacoes_Ponto_a_Ponto_ implements PlugIn, DialogListener {
 		return valorPixel;
 	}
 	
-	
 }
