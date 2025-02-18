@@ -30,7 +30,7 @@ public class Operacoes_Ponto_a_Ponto_ implements PlugIn, DialogListener {
 		interfaceGrafica.addSlider("Brilho", -255, 255, 0, 1);
 		interfaceGrafica.addSlider("Contraste", -255, 255, 0, 1);
 		interfaceGrafica.addSlider("Solarização", 0, 255, 0, 1);
-		interfaceGrafica.addSlider("Dessaturação", 0, 1, 1, 0.1);
+		interfaceGrafica.addSlider("Dessaturação", 0, 1, 1, 0.01);
 		
 		interfaceGrafica.showDialog();		
 		
@@ -125,7 +125,8 @@ public class Operacoes_Ponto_a_Ponto_ implements PlugIn, DialogListener {
 	
 	public int calcularDessaturacao(int valorPixel, Double saturacao, int media){
 		if(saturacao<1) {
-			valorPixel = (int)(media - ((valorPixel - media) * saturacao));			
+			valorPixel = (int)(media + ((valorPixel - media) * saturacao));	
+
 		}
 		return valorPixel;
 	}
