@@ -82,3 +82,8 @@ java --version
    ```bash  
     ant run
    ```
+
+3. **Compile apenas os plugins**:
+   ```bash  
+    ant plugins
+   ```
