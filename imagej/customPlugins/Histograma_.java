@@ -152,14 +152,23 @@ public class Histograma_ implements  PlugIn, DialogListener{
                 vetorPA[x] = vetorPA[x] + vetorP[y];
             }
             
-            //arredondar Sk
+            // Operacoes Sk
             vetorPA[x] = vetorPA[x] * 255; // (256-1)
             vetorSK[x] = (int) (vetorPA[x] -(vetorPA[x]%1)); // (Parte inteira - Parte decimal) = Parte inteira
             
             if(vetorPA[x]%1 >= 0.5) // Arredondamento Padrao
             {
                 vetorSK[x]++;
-            }            
+            }    
+
+			//Arredondamento para baixo
+			// Basta comentar o if acima
+		
+			// Arredondamento para cima
+			// if(vetorPA[x]%1 > 0)
+            // {
+            //     vetorSK[x]++;
+            // }          
         }
         
         //Set image
