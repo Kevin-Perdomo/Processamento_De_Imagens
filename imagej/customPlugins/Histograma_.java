@@ -9,6 +9,8 @@ import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import ij.gui.Plot;
 
+// https://pt.wikipedia.org/wiki/Equaliza%C3%A7%C3%A3o_de_histograma
+
 public class Histograma_ implements  PlugIn, DialogListener{
     public void run(String arg) {
         ImagePlus imagem = IJ.getImage();
@@ -139,7 +141,7 @@ public class Histograma_ implements  PlugIn, DialogListener{
             }
         }
         
-        //calcular pr(rk)
+        //calcular Pr(rk)
         for(int i = 0; i<256; i++){
             vetorP[i] = vetorTons[i] * 1.0 / areaImagem; 
         }
@@ -151,10 +153,10 @@ public class Histograma_ implements  PlugIn, DialogListener{
             }
             
             //arredondar Sk
-            vetorPA[x] = vetorPA[x] * 255;
-            vetorSK[x] = (int) (vetorPA[x] -(vetorPA[x]%1));
+            vetorPA[x] = vetorPA[x] * 255; // (256-1)
+            vetorSK[x] = (int) (vetorPA[x] -(vetorPA[x]%1)); // (Parte inteira - Parte decimal) = Parte inteira
             
-            if(vetorPA[x]%1 > 0)
+            if(vetorPA[x]%1 >= 0.5) // Arredondamento Padrao
             {
                 vetorSK[x]++;
             }            
