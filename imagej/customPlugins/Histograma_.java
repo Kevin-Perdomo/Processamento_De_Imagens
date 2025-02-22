@@ -141,12 +141,12 @@ public class Histograma_ implements  PlugIn, DialogListener{
             }
         }
         
-        //calcular Pr(rk)
+        //calcular Pr(Distribuição de Probabilidade dos níveis de cinza)
         for(int i = 0; i<256; i++){
             vetorP[i] = vetorTons[i] * 1.0 / areaImagem; 
         }
         
-        //Calcular Sk
+        //Calcular Sk(Função de Distribuição Acumulada - CDF)
         for (int x = 0; x < 256; x++) {    
             for (int y = 0; y < x; y++) {
                 vetorPA[x] = vetorPA[x] + vetorP[y];
@@ -154,16 +154,17 @@ public class Histograma_ implements  PlugIn, DialogListener{
             
             // Operacoes Sk
             vetorPA[x] = vetorPA[x] * 255; // (256-1)
-            vetorSK[x] = (int) (vetorPA[x] -(vetorPA[x]%1)); // (Parte inteira - Parte decimal) = Parte inteira
+            vetorSK[x] = (int) (vetorPA[x] - (vetorPA[x]%1)); // Truncamento -> (Parte inteira - Parte decimal) = Parte inteira
             
-            if(vetorPA[x]%1 >= 0.5) // Arredondamento Padrao
+			//Arredondamento para baixo
+			// Basta comentar os IFs abaixo
+
+			// Arredondamento Padrao
+            if(vetorPA[x]%1 >= 0.5) 
             {
                 vetorSK[x]++;
             }    
 
-			//Arredondamento para baixo
-			// Basta comentar o if acima
-		
 			// Arredondamento para cima
 			// if(vetorPA[x]%1 > 0)
             // {
