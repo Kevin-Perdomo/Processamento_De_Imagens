@@ -147,26 +147,29 @@ public class Histograma_ implements  PlugIn, DialogListener{
         }
         
         //Calcular Sk(Função de Distribuição Acumulada - CDF)
-        for (int x = 0; x < 256; x++) {    
-            for (int y = 0; y < x; y++) {
-                vetorPA[x] = vetorPA[x] + vetorP[y];
+        for (int x = 0; x < 256; x++) {
+            // Caso especial para o primeiro elemento
+            if (x == 0) {
+                vetorPA[x] = vetorP[x];
+            } else {
+                vetorPA[x] = vetorPA[x-1] + vetorP[x];
             }
             
             // Operacoes Sk
             vetorPA[x] = vetorPA[x] * 255; // (256-1)
             vetorSK[x] = (int) (vetorPA[x] - (vetorPA[x]%1)); // Truncamento -> (Parte inteira - Parte decimal) = Parte inteira
             
-			//Arredondamento para baixo
-			// Basta comentar os IFs abaixo
+            //Arredondamento para baixo
+            // Basta comentar os IFs abaixo
 
-			// Arredondamento Padrao
+            // Arredondamento Padrao
             if(vetorPA[x]%1 >= 0.5) 
             {
                 vetorSK[x]++;
             }    
 
-			// Arredondamento para cima
-			// if(vetorPA[x]%1 > 0)
+            // Arredondamento para cima
+            // if(vetorPA[x]%1 > 0)
             // {
             //     vetorSK[x]++;
             // }          
