@@ -30,7 +30,7 @@ public class Histograma_ implements  PlugIn, DialogListener{
         imagemCopia.show();
         
         // Mostrar histograma da imagem original
-        mostrarHistograma(imagem, "Histograma Original");
+        // mostrarHistograma(imagem, "Histograma Original");
 
         String[] estrategia = {"Expansão", "Equalização"};
         GenericDialog interfaceGrafica = new GenericDialog("Histograma");
@@ -114,7 +114,7 @@ public class Histograma_ implements  PlugIn, DialogListener{
         imagem.show();
         
         // Mostrar histograma da imagem modificada
-        mostrarHistograma(imagem, "Histograma Modificado");
+        // mostrarHistograma(imagem, "Histograma Modificado");
     }
     
     
@@ -169,7 +169,7 @@ public class Histograma_ implements  PlugIn, DialogListener{
         imagem.show();
         
         // Mostrar histograma da imagem modificada
-        mostrarHistograma(imagem, "Histograma Modificado");
+        // mostrarHistograma(imagem, "Histograma Modificado");
     }
 
     private void mostrarHistograma(ImagePlus imagem, String titulo) {
