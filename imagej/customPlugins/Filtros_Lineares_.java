@@ -109,7 +109,7 @@ public class Filtros_Lineares_ implements PlugIn {
                 // Aplica o kernel 3x3
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        soma += ipCopy.getPixel(x + i, y + j) * kernel[i + 1][j + 1];
+                        soma += ipCopy.getPixel(x + i, y + j) * kernel[i + 1][j + 1]; // Somatorio (pixel[z] * kernel[z]) 
                     }
                 }
                 ip.putPixel(x, y, soma / divisor); 
