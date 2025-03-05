@@ -11,6 +11,7 @@ public class Filtros_Lineares_ implements PlugIn {
 
     @Override
     public void run(String arg) {
+        // Diálogo para selecionar o filtro
         GenericDialog gd = new GenericDialog("Filtros");
         gd.addRadioButtonGroup("Escolha o filtro:", new String[]{
                 "Passa-Baixa (Média)",
@@ -30,21 +31,24 @@ public class Filtros_Lineares_ implements PlugIn {
             return;
         }
 
+        // Obtém a imagem atual
         ImagePlus imp = IJ.getImage();
         if (imp == null) {
             IJ.showMessage("Erro", "Nenhuma imagem aberta.");
             return;
         }
 
+        // Verifica se a imagem está em tons de cinza
         if (imp.getType() != ImagePlus.GRAY8) {
             IJ.showMessage("Erro", "A imagem precisa estar em tons de cinza (8 bits).");
             return;
         }
 
+        // Processa a imagem
         ImageProcessor ip = imp.getProcessor();
-        ImageProcessor ipCopy = ip.duplicate(); // Duplicando a imagem original
+        ImageProcessor ipCopy = ip.duplicate(); // Duplicando a imagem original para não modificar a original
 
-        // Aplica o filtro selecionado
+        // Aplica o filtro escolhido
         if (filtroSelecionado.equals("Passa-Baixa (Média)")) {
             aplicarPassaBaixaMedia(ipCopy);
             mostrarImagemFiltrada(ipCopy, "Imagem Passa-Baixa");
@@ -56,7 +60,7 @@ public class Filtros_Lineares_ implements PlugIn {
             mostrarImagemFiltrada(ipCopy, "Imagem Detecção de Bordas");
         }
 
-        // Mostrar a imagem original
+        // Exibe a imagem original
         imp.show();
     }
 
@@ -67,7 +71,8 @@ public class Filtros_Lineares_ implements PlugIn {
                 {1, 1, 1}
         };
 
-        aplicarConvolucao(ip, kernel, 9);  // Divisor fixo de 9 para a média
+        // Aplica a convolução com divisor fixo de 9 (média)
+        aplicarConvolucao(ip, kernel, 9);
     }
 
     private void aplicarPassaAlta(ImageProcessor ip) {
@@ -77,6 +82,7 @@ public class Filtros_Lineares_ implements PlugIn {
             {1, -2, 1} 
         };
 
+        // Aplica a convolução com divisor fixo de 1
         aplicarConvolucao(ip, kernel, 1); 
     }
 
@@ -87,6 +93,7 @@ public class Filtros_Lineares_ implements PlugIn {
                 {1, 0, -1} 
         };
 
+        // Aplica a convolução com divisor fixo de 1
         aplicarConvolucao(ip, kernel, 1);
     }
 
@@ -95,11 +102,11 @@ public class Filtros_Lineares_ implements PlugIn {
         int height = ip.getHeight();
         ImageProcessor ipCopy = ip.duplicate();
         
-        // Convolução: começamos de 1 e vamos até -1 para evitar as bordas
+        // Aplica a convolução, ignorando as bordas da imagem
         for (int x = 1; x < width - 1; x++) {
             for (int y = 1; y < height - 1; y++) {
                 int soma = 0;
-                // Aplicando o kernel 3x3
+                // Aplica o kernel 3x3
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
                         soma += ipCopy.getPixel(x + i, y + j) * kernel[i + 1][j + 1];
@@ -111,7 +118,7 @@ public class Filtros_Lineares_ implements PlugIn {
     }
 
     private void mostrarImagemFiltrada(ImageProcessor ip, String nomeImagem) {
-        // Criar uma nova imagem para mostrar a imagem filtrada com o nome apropriado
+        // Cria uma nova imagem para mostrar a imagem filtrada
         ImagePlus impFiltered = new ImagePlus(nomeImagem, ip);
         impFiltered.show();
     }
