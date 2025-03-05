@@ -1,138 +1,105 @@
-import ij.IJ;
-import ij.ImagePlus;
-import ij.plugin.PlugIn;
-import ij.process.ImageProcessor;
+import ij.*;
+import ij.plugin.*;
+import ij.process.*;
+import ij.gui.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Arrays;
 
-public class Filtros_Nao_Lineares_ implements PlugIn{
-	public void run(String arg) {
-		ImagePlus imagem = IJ.getImage();
-		
-		if (imagem.getType() == ImagePlus.GRAY8) {
-			processarImagem(imagem);
-		}
-		else {
-			IJ.error("Imagem não é 8_Bits");
-		}	
-	}
-	
-public void processarImagem(ImagePlus imagemOriginal) {
-		
-		ImageProcessor processadorOriginal = imagemOriginal.getProcessor();
-		
-		int larguraImagem = imagemOriginal.getWidth(), alturaImagem = imagemOriginal.getHeight();
-		
-		ImagePlus imagemVertical  = imagemOriginal.duplicate();
-		imagemVertical.setTitle("Vertical");     
-		ImageProcessor processadorVertical = imagemVertical.getProcessor();
-		
-		ImagePlus imagemHorizontal = imagemOriginal.duplicate();
-		imagemHorizontal.setTitle("Horizontal");
-		ImageProcessor processadorHorizontal = imagemHorizontal.getProcessor();
-		
-		ImagePlus imagemFusao = imagemOriginal.duplicate();
-		imagemFusao.setTitle("Fusao");
-		ImageProcessor processadorFusao = imagemFusao.getProcessor();
-		
-		
-		int x,y;
-		for ( x = 1; x < larguraImagem-1; x++) {	
-			for ( y = 1; y < alturaImagem-1; y++) {
-				vertical(processadorOriginal, processadorVertical, x, y);
-				horizontal(processadorOriginal, processadorHorizontal, x, y);
-				fusao(processadorVertical, processadorHorizontal, processadorFusao, x, y);
-			}
-		}
-		
-		imagemVertical.setProcessor(processadorVertical);
-		imagemHorizontal.setProcessor(processadorHorizontal);
-		imagemFusao.setProcessor(processadorFusao);
-		
-		imagemVertical.show();
-		imagemHorizontal.show();
-		imagemFusao.show();
-			
-	}
-	
-	public void vertical(ImageProcessor processadorOriginal, ImageProcessor processadorVertical, int x, int y) {
-		int[][] mascara = {{-1,0,1},{-2,0,2},{-1,0,1}};
-		
-		int r = 0, s=0;
-		int soma = 0;
-		
-		for(int a = x-1; a <= x+1; a++) {	
-			for (int b = y-1; b <= y+1; b++) {
-				soma = soma + (processadorOriginal.getPixel(a, b)*(mascara[r][s]));
-				r++;
-			}
-			s++;
-			r=0;
-		}
-		
-		
-		if(soma>255) {
-			soma = 255;
-		}else {
-			if(soma<0) {
-				soma = 0;
-			}
-		}
-		
-		processadorVertical.putPixel(x, y, soma);
-		
-	}
-		
-	public void horizontal(ImageProcessor processadorOriginal, ImageProcessor processadorHorizontal, int x, int y) {
-		int[][] mascara = {{1,2,1},{0,0,0},{-1,-2,-1}};
-		
-		int r = 0, s=0;
-		int soma = 0;
-		
-		for(int a = x-1; a <= x+1; a++) {	
-			for (int b = y-1; b <= y+1; b++) {
-				soma = soma + (processadorOriginal.getPixel(a, b)*(mascara[r][s]));
-				r++;
-			}
-			s++;
-			r=0;
-		}
-		
-		
-		if(soma>255) {
-			soma = 255;
-		}else {
-			if(soma<0) {
-				soma = 0;
-			}
-		}
-	
-		processadorHorizontal.putPixel(x, y, soma);
-		
-	}
-	
-	public void fusao(ImageProcessor processadorVertical, ImageProcessor processadorHorizontal, ImageProcessor processadorFusao, int x, int y) {
-	
-		double resultado = 0;
-		
-	//	resultado = Math.sqrt((processadorVertical.getPixel(a, b)*processadorVertical.getPixel(a, b))
-	//			+(processadorHorizontal.getPixel(a, b)*processadorHorizontal.getPixel(a, b)));
-		
-		for(int a = x-1; a <= x+1; a++) {	
-			for (int b = y-1; b <= y+1; b++) {
-				
-				resultado = Math.sqrt((processadorVertical.getPixel(a, b)*processadorVertical.getPixel(a, b))
-						+(processadorHorizontal.getPixel(a, b)*processadorHorizontal.getPixel(a, b)));
-			}
-		}
-		
-		if(resultado>=255) {
-			resultado = 255;
-		}else {
-			if(resultado<0) {
-				resultado = 0;
-			}
-		}
-		
-		processadorFusao.putPixel(x, y, (int)resultado);
-		
-	}
+public class Filtros_Nao_Lineares_ implements PlugIn {
+    private String filtroSelecionado = "Sobel";
+
+    @Override
+    public void run(String arg) {
+        ImagePlus imp = IJ.getImage();
+        if (imp == null) {
+            IJ.showMessage("Erro", "Nenhuma imagem aberta.");
+            return;
+        }
+        
+        if (imp.getType() != ImagePlus.GRAY8) {
+            IJ.showMessage("Erro", "A imagem precisa estar em tons de cinza (8 bits).");
+            return;
+        }
+
+        GenericDialog gd = new GenericDialog("Filtros");
+        gd.addRadioButtonGroup("Escolha o filtro:", new String[]{"Sobel", "Mediana"}, 2, 1, filtroSelecionado);
+        gd.showDialog();
+        if (gd.wasCanceled()) return;
+        
+        filtroSelecionado = gd.getNextRadioButton();
+        ImageProcessor ip = imp.getProcessor().duplicate();
+        
+        if (filtroSelecionado.equals("Sobel")) {
+            aplicarSobel(ip);
+        } else {
+            aplicarMediana(ip);
+        }
+    }
+
+    private void aplicarSobel(ImageProcessor ip) {
+        int[][] kernelVertical = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+        int[][] kernelHorizontal = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
+        
+        ImageProcessor gx = ip.duplicate();
+        ImageProcessor gy = ip.duplicate();
+        aplicarConvolucao(gx, kernelVertical);
+        aplicarConvolucao(gy, kernelHorizontal);
+        
+        ImageProcessor g = ip.duplicate();
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int sobelX = gx.getPixel(x, y);
+                int sobelY = gy.getPixel(x, y);
+                int resultado = (int) Math.sqrt(sobelX * sobelX + sobelY * sobelY);
+                g.putPixel(x, y, resultado);
+            }
+        }
+        
+        new ImagePlus("Sobel - Vertical", gx).show();
+        new ImagePlus("Sobel - Horizontal", gy).show();
+        new ImagePlus("Sobel - Resultado", g).show();
+    }
+
+    private void aplicarConvolucao(ImageProcessor ip, int[][] kernel) {
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        ImageProcessor temp = ip.duplicate();
+        
+        for (int x = 1; x < width - 1; x++) {
+            for (int y = 1; y < height - 1; y++) {
+                int soma = 0;
+                for (int kx = -1; kx <= 1; kx++) {
+                    for (int ky = -1; ky <= 1; ky++) {
+                        soma += temp.getPixel(x + kx, y + ky) * kernel[ky + 1][kx + 1];
+                    }
+                }
+                ip.putPixel(x, y, soma);
+            }
+        }
+    }
+
+    private void aplicarMediana(ImageProcessor ip) {
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        ImageProcessor temp = ip.duplicate();
+        
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = 1; x < width - 1; x++) {
+                int[] vizinhanca = new int[9];
+                int index = 0;
+                for (int ky = -1; ky <= 1; ky++) {
+                    for (int kx = -1; kx <= 1; kx++) {
+                        vizinhanca[index++] = temp.getPixel(x + kx, y + ky);
+                    }
+                }
+                Arrays.sort(vizinhanca);
+                ip.putPixel(x, y, vizinhanca[4]);
+            }
+        }
+        new ImagePlus("Filtro de Mediana", ip).show();
+    }
 }

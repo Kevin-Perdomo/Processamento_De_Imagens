@@ -1,150 +1,129 @@
-import ij.IJ;
-import ij.ImagePlus;
-import ij.plugin.PlugIn;
-import ij.process.ImageProcessor;
-import javax.swing.*;
+import ij.*;
+import ij.plugin.*;
+import ij.process.*;
+import ij.gui.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class Filtros_Lineares_ implements PlugIn {
-    
-    private JRadioButton rbPassaBaixa, rbPassaAlta, rbBorda;
-    private ButtonGroup grupoFiltros;
-    private JFrame frame;
 
+    private String filtroSelecionado = "Passa-Baixa (Média)";
+
+    @Override
     public void run(String arg) {
-        SwingUtilities.invokeLater(() -> criarInterface());
-    }
+        GenericDialog gd = new GenericDialog("Filtros");
+        gd.addRadioButtonGroup("Escolha o filtro:", new String[]{
+                "Passa-Baixa (Média)",
+                "Passa-Alta",
+                "Detecção de Bordas"
+        }, 3, 1, filtroSelecionado);
 
-    private void criarInterface() {
-    frame = new JFrame("Filtros Lineares");
-    frame.setSize(280, 200);
-    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+        gd.addDialogListener(new DialogListener() {
+            public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
+                filtroSelecionado = gd.getNextRadioButton();
+                return true;
+            }
+        });
 
-    JLabel label = new JLabel("Escolha um filtro:");
-    label.setAlignmentX(Component.LEFT_ALIGNMENT);
-    frame.add(label);
-
-    rbPassaBaixa = new JRadioButton("Filtro Passa-Baixa (Média)");
-    rbPassaAlta = new JRadioButton("Filtro Passa-Alta");
-    rbBorda = new JRadioButton("Filtro de Borda");
-
-    grupoFiltros = new ButtonGroup();
-    grupoFiltros.add(rbPassaBaixa);
-    grupoFiltros.add(rbPassaAlta);
-    grupoFiltros.add(rbBorda);
-
-    frame.add(rbPassaBaixa);
-    frame.add(rbPassaAlta);
-    frame.add(rbBorda);
-
-    JButton btnAplicar = new JButton("Aplicar Filtro");
-    btnAplicar.setAlignmentX(Component.LEFT_ALIGNMENT);
-    btnAplicar.addActionListener(e -> aplicarFiltro());
-    frame.add(btnAplicar);
-
-    JButton btnFechar = new JButton("      Fechar      ");
-    btnFechar.setAlignmentX(Component.LEFT_ALIGNMENT);
-    btnFechar.addActionListener(e -> frame.dispose());
-    frame.add(btnFechar);
-
-    frame.setVisible(true);
-
-    }
-
-    private void aplicarFiltro() {
-        ImagePlus imagem = IJ.getImage();
-
-        if (imagem == null) {
-            IJ.error("Nenhuma imagem aberta!");
+        gd.showDialog();
+        if (gd.wasCanceled()) {
             return;
         }
 
-        if (imagem.getType() != ImagePlus.GRAY8) {
-            IJ.error("A imagem precisa estar em 8 bits (tons de cinza).");
+        ImagePlus imp = IJ.getImage();
+        if (imp == null) {
+            IJ.showMessage("Erro", "Nenhuma imagem aberta.");
             return;
         }
 
-        if (rbPassaBaixa.isSelected()) {
-            processarImagem(imagem, "PassaBaixaMedia");
-        } else if (rbPassaAlta.isSelected()) {
-            processarImagem(imagem, "PassaAlta");
-        } else if (rbBorda.isSelected()) {
-            processarImagem(imagem, "Borda");
-        } else {
-            IJ.error("Selecione um filtro antes de aplicar.");
-        }
-    }
-
-    private void processarImagem(ImagePlus imagemOriginal, String filtro) {
-        ImageProcessor processadorOriginal = imagemOriginal.getProcessor();
-        ImagePlus imagemProcessada = imagemOriginal.duplicate();
-        imagemProcessada.setTitle(filtro);
-        ImageProcessor processadorNovo = imagemProcessada.getProcessor();
-
-        int largura = imagemOriginal.getWidth();
-        int altura = imagemOriginal.getHeight();
-
-        for (int x = 1; x < largura - 1; x++) {
-            for (int y = 1; y < altura - 1; y++) {
-                if (filtro.equals("PassaBaixaMedia")) {
-                    passaBaixaMedia(processadorOriginal, processadorNovo, x, y);
-                } else if (filtro.equals("PassaAlta")) {
-                    passaAlta(processadorOriginal, processadorNovo, x, y);
-                } else if (filtro.equals("Borda")) {
-                    borda(processadorOriginal, processadorNovo, x, y);
-                }
-            }
+        // Converter RGB para 8 bits
+        if (imp.getType() == ImagePlus.COLOR_RGB) {
+            IJ.run(imp, "8-bit", "");
         }
 
-        imagemProcessada.setProcessor(processadorNovo);
-        imagemProcessada.show();
-    }
+        ImageProcessor ip = imp.getProcessor();
+        ImageProcessor ipCopy = ip.duplicate(); // Duplicando a imagem original
 
-    private void passaBaixaMedia(ImageProcessor processadorOriginal, ImageProcessor processadorNovo, int x, int y) {
-        int soma = 0;
-
-        for (int a = x - 1; a <= x + 1; a++) {
-            for (int b = y - 1; b <= y + 1; b++) {
-                soma += processadorOriginal.getPixel(a, b);
-            }
+        // Aplica o filtro selecionado
+        if (filtroSelecionado.equals("Passa-Baixa (Média)")) {
+            aplicarPassaBaixaMedia(ipCopy);
+            mostrarImagemFiltrada(ipCopy, "Imagem Passa-Baixa");
+        } else if (filtroSelecionado.equals("Passa-Alta")) {
+            aplicarPassaAlta(ipCopy);
+            mostrarImagemFiltrada(ipCopy, "Imagem Passa-Alta");
+        } else if (filtroSelecionado.equals("Detecção de Bordas")) {
+            aplicarDeteccaoBordas(ipCopy);
+            mostrarImagemFiltrada(ipCopy, "Imagem Detecção de Bordas");
         }
 
-        int media = soma / 9;
-        processadorNovo.putPixel(x, y, Math.min(Math.max(media, 0), 255));
+        // Mostrar a imagem original
+        imp.show();
     }
 
-    private void passaAlta(ImageProcessor processadorOriginal, ImageProcessor processadorNovo, int x, int y) {
-        int[][] mascara = { 
+    private void aplicarPassaBaixaMedia(ImageProcessor ip) {
+        int[][] kernel = {
+                {1, 1, 1},
+                {1, 1, 1},
+                {1, 1, 1}
+        };
+
+        aplicarConvolucao(ip, kernel);  // Média, divisor calculado automaticamente
+    }
+
+    private void aplicarPassaAlta(ImageProcessor ip) {
+        int[][] kernel = {
             {1, -2, 1},
             {-2, 5, -2}, 
             {1, -2, 1} 
         };
 
-        aplicarMascara(processadorOriginal, processadorNovo, x, y, mascara);
+        aplicarConvolucao(ip, kernel);  // Passa-alta, divisor calculado automaticamente
     }
 
-    private void borda(ImageProcessor processadorOriginal, ImageProcessor processadorNovo, int x, int y) {
-        int[][] mascara = { 
-            {1, 0, -1}, 
-            {1, 0, -1}, 
-            {1, 0, -1} 
+    private void aplicarDeteccaoBordas(ImageProcessor ip) {
+        int[][] kernel = {
+                {1, 0, -1}, 
+                {1, 0, -1}, 
+                {1, 0, -1} 
         };
 
-        aplicarMascara(processadorOriginal, processadorNovo, x, y, mascara);
+        aplicarConvolucao(ip, kernel);  // Detecção de bordas, divisor calculado automaticamente
     }
 
-    private void aplicarMascara(ImageProcessor processadorOriginal, ImageProcessor processadorNovo, int x, int y, int[][] mascara) {
-        int soma = 0;
-
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                soma += processadorOriginal.getPixel(x + i, y + j) * mascara[i + 1][j + 1];
+    private void aplicarConvolucao(ImageProcessor ip, int[][] kernel) {
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        ImageProcessor ipCopy = ip.duplicate();
+        
+        // Cálculo do divisor (somatório dos elementos do kernel)
+        int divisor = 0;
+        for (int i = 0; i < kernel.length; i++) {
+            for (int j = 0; j < kernel[i].length; j++) {
+                divisor += kernel[i][j];
             }
         }
+        
+        // Previne divisão por zero (caso o kernel tenha todos os valores igual a 0)
+        if (divisor == 0) divisor = 1;
 
-        processadorNovo.putPixel(x, y, Math.min(Math.max(soma, 0), 255));
+        // Convolução: começamos de 1 e vamos até -1 para evitar as bordas
+        for (int x = 1; x < width - 1; x++) {
+            for (int y = 1; y < height - 1; y++) {
+                int soma = 0;
+                // Aplicando o kernel 3x3
+                for (int kx = -1; kx <= 1; kx++) {
+                    for (int ky = -1; ky <= 1; ky++) {
+                        soma += ipCopy.getPixel(x + kx, y + ky) * kernel[kx + 1][ky + 1];
+                    }
+                }
+                ip.putPixel(x, y, soma / divisor);
+            }
+        }
+    }
+
+    private void mostrarImagemFiltrada(ImageProcessor ip, String nomeImagem) {
+        // Criar uma nova imagem para mostrar a imagem filtrada com o nome apropriado
+        ImagePlus impFiltered = new ImagePlus(nomeImagem, ip);
+        impFiltered.show();
     }
 }
