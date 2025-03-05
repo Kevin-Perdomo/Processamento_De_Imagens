@@ -67,7 +67,7 @@ public class Filtros_Lineares_ implements PlugIn {
                 {1, 1, 1}
         };
 
-        aplicarConvolucao(ip, kernel);  // Média, divisor calculado automaticamente
+        aplicarConvolucao(ip, kernel, 9);  // Divisor fixo de 9 para a média
     }
 
     private void aplicarPassaAlta(ImageProcessor ip) {
@@ -77,7 +77,7 @@ public class Filtros_Lineares_ implements PlugIn {
             {1, -2, 1} 
         };
 
-        aplicarConvolucao(ip, kernel);  // Passa-alta, divisor calculado automaticamente
+        aplicarConvolucao(ip, kernel, 1); 
     }
 
     private void aplicarDeteccaoBordas(ImageProcessor ip) {
@@ -87,36 +87,25 @@ public class Filtros_Lineares_ implements PlugIn {
                 {1, 0, -1} 
         };
 
-        aplicarConvolucao(ip, kernel);  // Detecção de bordas, divisor calculado automaticamente
+        aplicarConvolucao(ip, kernel, 1);
     }
 
-    private void aplicarConvolucao(ImageProcessor ip, int[][] kernel) {
+    private void aplicarConvolucao(ImageProcessor ip, int[][] kernel, int divisor) {
         int width = ip.getWidth();
         int height = ip.getHeight();
         ImageProcessor ipCopy = ip.duplicate();
         
-        // Cálculo do divisor (somatório dos elementos do kernel)
-        int divisor = 0;
-        for (int i = 0; i < kernel.length; i++) {
-            for (int j = 0; j < kernel[i].length; j++) {
-                divisor += kernel[i][j];
-            }
-        }
-        
-        // Previne divisão por zero (caso o kernel tenha todos os valores igual a 0)
-        if (divisor == 0) divisor = 1;
-
         // Convolução: começamos de 1 e vamos até -1 para evitar as bordas
         for (int x = 1; x < width - 1; x++) {
             for (int y = 1; y < height - 1; y++) {
                 int soma = 0;
                 // Aplicando o kernel 3x3
-                for (int kx = -1; kx <= 1; kx++) {
-                    for (int ky = -1; ky <= 1; ky++) {
-                        soma += ipCopy.getPixel(x + kx, y + ky) * kernel[kx + 1][ky + 1];
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
+                        soma += ipCopy.getPixel(x + i, y + j) * kernel[i + 1][j + 1];
                     }
                 }
-                ip.putPixel(x, y, soma / divisor);
+                ip.putPixel(x, y, soma / divisor); 
             }
         }
     }

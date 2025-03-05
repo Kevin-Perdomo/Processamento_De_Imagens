@@ -72,9 +72,9 @@ public class Filtros_Nao_Lineares_ implements PlugIn {
         for (int x = 1; x < width - 1; x++) {
             for (int y = 1; y < height - 1; y++) {
                 int soma = 0;
-                for (int kx = -1; kx <= 1; kx++) {
-                    for (int ky = -1; ky <= 1; ky++) {
-                        soma += temp.getPixel(x + kx, y + ky) * kernel[ky + 1][kx + 1];
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
+                        soma += temp.getPixel(x + i, y + j) * kernel[i + 1][j + 1];
                     }
                 }
                 ip.putPixel(x, y, soma);
@@ -91,9 +91,9 @@ public class Filtros_Nao_Lineares_ implements PlugIn {
             for (int x = 1; x < width - 1; x++) {
                 int[] vizinhanca = new int[9];
                 int index = 0;
-                for (int ky = -1; ky <= 1; ky++) {
-                    for (int kx = -1; kx <= 1; kx++) {
-                        vizinhanca[index++] = temp.getPixel(x + kx, y + ky);
+                for (int j = -1; j <= 1; j++) {
+                    for (int i = -1; i <= 1; i++) {
+                        vizinhanca[index++] = temp.getPixel(x + i, y + j);
                     }
                 }
                 Arrays.sort(vizinhanca);
