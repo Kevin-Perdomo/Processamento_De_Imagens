@@ -36,9 +36,9 @@ public class Filtros_Lineares_ implements PlugIn {
             return;
         }
 
-        // Converter RGB para 8 bits
-        if (imp.getType() == ImagePlus.COLOR_RGB) {
-            IJ.run(imp, "8-bit", "");
+        if (imp.getType() != ImagePlus.GRAY8) {
+            IJ.showMessage("Erro", "A imagem precisa estar em tons de cinza (8 bits).");
+            return;
         }
 
         ImageProcessor ip = imp.getProcessor();
