@@ -15,9 +15,14 @@ public class Operacoes_Morfologicas_Binarias_ implements PlugIn {
             return;
         }
 
+        if (!isBinaryImage(imagem.getProcessor())) {
+            IJ.showMessage("Erro", "A imagem não é binária. Certifique-se de que a imagem contém apenas valores 0 e 255.");
+            return;
+        }
+
         GenericDialog gd = new GenericDialog("Operações Morfológicas");
-        gd.addRadioButtonGroup("Escolha a operação:", 
-            new String[]{"Dilatação", "Erosão", "Abertura", "Fechamento", "Borda"}, 
+        gd.addRadioButtonGroup("Escolha a operação:",
+            new String[]{"Dilatação", "Erosão", "Abertura", "Fechamento", "Borda"},
             5, 1, "Dilatação");
         gd.showDialog();
 
@@ -34,12 +39,12 @@ public class Operacoes_Morfologicas_Binarias_ implements PlugIn {
                 processar(processor, "erosao");
                 break;
             case "Abertura":
-                processar(processor, "erosao"); // Aplica erosão primeiro
-                processar(processor, "dilatacao"); // Depois a dilatação
+                processar(processor, "erosao");
+                processar(processor, "dilatacao");
                 break;
             case "Fechamento":
-                processar(processor, "dilatacao"); // Aplica dilatação primeiro
-                processar(processor, "erosao"); // Depois a erosão
+                processar(processor, "dilatacao");
+                processar(processor, "erosao");
                 break;
             case "Borda":
                 ByteProcessor copia = (ByteProcessor) processor.duplicate();
@@ -49,6 +54,21 @@ public class Operacoes_Morfologicas_Binarias_ implements PlugIn {
         }
 
         new ImagePlus("Resultado - " + operacao, processor).show();
+    }
+
+    private boolean isBinaryImage(ImageProcessor img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixel = img.getPixel(x, y);
+                if (pixel != 0 && pixel != 255) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void processar(ImageProcessor img, String tipo) {
