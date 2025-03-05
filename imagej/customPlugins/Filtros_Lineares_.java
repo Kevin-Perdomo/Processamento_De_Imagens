@@ -18,36 +18,40 @@ public class Filtros_Lineares_ implements PlugIn {
     }
 
     private void criarInterface() {
-        frame = new JFrame("Filtros Lineares");
-        frame.setSize(300, 200);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLayout(new GridLayout(5, 1));
+    frame = new JFrame("Filtros Lineares");
+    frame.setSize(280, 200);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 
-        JLabel label = new JLabel("Escolha um filtro:");
-        frame.add(label);
+    JLabel label = new JLabel("Escolha um filtro:");
+    label.setAlignmentX(Component.LEFT_ALIGNMENT);
+    frame.add(label);
 
-        rbPassaBaixa = new JRadioButton("Filtro Passa-Baixa (Média)");
-        rbPassaAlta = new JRadioButton("Filtro Passa-Alta");
-        rbBorda = new JRadioButton("Filtro de Borda");
+    rbPassaBaixa = new JRadioButton("Filtro Passa-Baixa (Média)");
+    rbPassaAlta = new JRadioButton("Filtro Passa-Alta");
+    rbBorda = new JRadioButton("Filtro de Borda");
 
-        grupoFiltros = new ButtonGroup();
-        grupoFiltros.add(rbPassaBaixa);
-        grupoFiltros.add(rbPassaAlta);
-        grupoFiltros.add(rbBorda);
+    grupoFiltros = new ButtonGroup();
+    grupoFiltros.add(rbPassaBaixa);
+    grupoFiltros.add(rbPassaAlta);
+    grupoFiltros.add(rbBorda);
 
-        frame.add(rbPassaBaixa);
-        frame.add(rbPassaAlta);
-        frame.add(rbBorda);
+    frame.add(rbPassaBaixa);
+    frame.add(rbPassaAlta);
+    frame.add(rbBorda);
 
-        JButton btnAplicar = new JButton("Aplicar Filtro");
-        btnAplicar.addActionListener(e -> aplicarFiltro());
-        frame.add(btnAplicar);
+    JButton btnAplicar = new JButton("Aplicar Filtro");
+    btnAplicar.setAlignmentX(Component.LEFT_ALIGNMENT);
+    btnAplicar.addActionListener(e -> aplicarFiltro());
+    frame.add(btnAplicar);
 
-        JButton btnFechar = new JButton("Fechar");
-        btnFechar.addActionListener(e -> frame.dispose());
-        frame.add(btnFechar);
+    JButton btnFechar = new JButton("      Fechar      ");
+    btnFechar.setAlignmentX(Component.LEFT_ALIGNMENT);
+    btnFechar.addActionListener(e -> frame.dispose());
+    frame.add(btnFechar);
 
-        frame.setVisible(true);
+    frame.setVisible(true);
+
     }
 
     private void aplicarFiltro() {
