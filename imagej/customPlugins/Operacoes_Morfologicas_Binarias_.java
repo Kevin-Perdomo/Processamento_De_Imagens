@@ -63,7 +63,7 @@ public class Operacoes_Morfologicas_Binarias_ implements PlugIn {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int pixel = img.getPixel(x, y);
-                if (pixel != 0 && pixel != 255) {
+                if (!(pixel == 0 || pixel == 255)) {
                     return false;
                 }
             }
