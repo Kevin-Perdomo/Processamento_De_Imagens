@@ -5,8 +5,9 @@
 **/plugins/
 **/plugins
 
-imagens_Arvores/Arvores Individuais/*
-imagens_Arvores/.ipynb_checkpoints/*
+imagens_Arvores/Arvores_Individuais/*
+**/Arvores_Individuais/*
+**/Arvores_Individuais
 
 **/ij.jar
 *ij.jar
