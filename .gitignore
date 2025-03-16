@@ -1,7 +1,12 @@
 */imagej/build
-*/imagej/plugins
 **/build/
+
+*/imagej/plugins
 **/plugins/
 **/plugins
+
+imagens_Arvores/*
+
 **/ij.jar
 *ij.jar
+
