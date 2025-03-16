@@ -65,7 +65,8 @@ public class Roi_Extractor_ implements PlugIn {
         IJ.run(img, "Fill Holes", "");
 
         // Identificar partículas (ROIs) automaticamente
-        IJ.run(img, "Analyze Particles...", "size=10-Infinity add");
+        // Definir tamanho minimo da area em pixels de forma a ignorar ruidos (Testar ...)
+        IJ.run(img, "Analyze Particles...", "size=1000-Infinity add");
 
         // Obter o RoiManager
         RoiManager roiManager = RoiManager.getInstance();
