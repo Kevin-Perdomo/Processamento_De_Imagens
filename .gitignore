@@ -7,6 +7,7 @@
 
 imagens_Arvores/Arvores_Individuais/*
 !imagens_Arvores/Arvores_Individuais/.gitkeep
+**/Arvores_Individuais/*
 
 **/ij.jar
 *ij.jar
