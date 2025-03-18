@@ -48,29 +48,28 @@ public class Roi_Extractor_ implements PlugIn {
         IJ.showMessage("Extração de ROIs concluída!");
     }
 
-    private void processImage(File file, File outputDir) {
-        // Abrir a imagem
-        ImagePlus img = IJ.openImage(file.getAbsolutePath());
-        if (img == null) {
+        private void processImage(File file, File outputDir) {
+        // Abrir a imagem original em cores
+        ImagePlus originalImg = IJ.openImage(file.getAbsolutePath());
+        if (originalImg == null) {
             IJ.log("Erro ao abrir imagem: " + file.getName());
             return;
         }
 
-        // Converter para 8-bit (necessário para threshold)
+        // Converter para 8-bit (para processamento de threshold)
+        ImagePlus img = originalImg.duplicate(); // Duplicar para manter a original em RGB
         IJ.run(img, "8-bit", "");
 
-        // Aplica um threshold (Limiar) automático
+        // Aplicar threshold automático
         IJ.setAutoThreshold(img, "Default");
 
-        // Converte a imagem para binário
+        // Converter para binário (máscara)
         IJ.run(img, "Convert to Mask", "");
 
-        // Preenche buracos internos na imagem 
+        // Preencher buracos internos
         IJ.run(img, "Fill Holes", "");
 
-        // Identificar partículas (ROIs) automaticamente
-        // Definir tamanho minimo da area em pixels de forma a ignorar ruidos 
-        // Testando... -> (32*32)=1024
+        // Detectar partículas (ROIs) com tamanho mínimo de 1024 pixels
         IJ.run(img, "Analyze Particles...", "size=1024-Infinity add");
 
         // Obter o RoiManager
@@ -79,23 +78,26 @@ public class Roi_Extractor_ implements PlugIn {
 
         Roi[] rois = roiManager.getRoisAsArray();
 
-        // Salvar cada ROI como imagem individual
+        // Salvar cada ROI como imagem RGB
         for (int i = 0; i < rois.length; i++) {
-            img.setRoi(rois[i]);
-            ImagePlus roiImage = new ImagePlus("ROI_" + i, img.getProcessor().crop());
+            // Definir ROI na imagem original (em cores)
+            originalImg.setRoi(rois[i]);
+            ImageProcessor processor = originalImg.getProcessor().crop(); // Recortar da imagem original em cores
+            ImagePlus roiImage = new ImagePlus("ROI_" + i, processor);
 
-            // Expressao regular para nomear a imagem de saida
-            File outputFile = new File(outputDir, file.getName().replaceAll("\\.\\w+$", "") + "_ROI_" + (i + 1) + ".png"); 
+            // Nome do arquivo de saída
+            File outputFile = new File(outputDir, file.getName().replaceAll("\\.\\w+$", "") + "_ROI_" + (i + 1) + ".png");
             try {
                 ImageIO.write(roiImage.getBufferedImage(), "PNG", outputFile);
-                IJ.log("ROI salva: " + outputFile.getAbsolutePath());
+                IJ.log("ROI salva em RGB: " + outputFile.getAbsolutePath());
             } catch (IOException e) {
                 IJ.log("Erro ao salvar ROI: " + e.getMessage());
             }
         }
-        
-        // Limpar RoiManager após processamento
+
+        // Limpar RoiManager após o processamento
         roiManager.reset();
+        originalImg.close();
         img.close();
     }
 }
