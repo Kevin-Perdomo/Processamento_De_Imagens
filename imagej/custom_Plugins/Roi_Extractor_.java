@@ -59,14 +59,19 @@ public class Roi_Extractor_ implements PlugIn {
         // Converter para 8-bit (necessário para threshold)
         IJ.run(img, "8-bit", "");
 
-        // Aplicar threshold
+        // Aplica um threshold (Limiar) automático
         IJ.setAutoThreshold(img, "Default");
+
+        // Converte a imagem para binário
         IJ.run(img, "Convert to Mask", "");
+
+        // Preenche buracos internos na imagem 
         IJ.run(img, "Fill Holes", "");
 
         // Identificar partículas (ROIs) automaticamente
-        // Definir tamanho minimo da area em pixels de forma a ignorar ruidos (Testar ...)
-        IJ.run(img, "Analyze Particles...", "size=1000-Infinity add");
+        // Definir tamanho minimo da area em pixels de forma a ignorar ruidos 
+        // Testando... -> (32*32)=1024
+        IJ.run(img, "Analyze Particles...", "size=1024-Infinity add");
 
         // Obter o RoiManager
         RoiManager roiManager = RoiManager.getInstance();
@@ -79,7 +84,8 @@ public class Roi_Extractor_ implements PlugIn {
             img.setRoi(rois[i]);
             ImagePlus roiImage = new ImagePlus("ROI_" + i, img.getProcessor().crop());
 
-            File outputFile = new File(outputDir, file.getName().replaceAll("\\.\\w+$", "") + "_ROI_" + (i + 1) + ".png");
+            // Expressao regular para nomear a imagem de saida
+            File outputFile = new File(outputDir, file.getName().replaceAll("\\.\\w+$", "") + "_ROI_" + (i + 1) + ".png"); 
             try {
                 ImageIO.write(roiImage.getBufferedImage(), "PNG", outputFile);
                 IJ.log("ROI salva: " + outputFile.getAbsolutePath());
@@ -87,7 +93,7 @@ public class Roi_Extractor_ implements PlugIn {
                 IJ.log("Erro ao salvar ROI: " + e.getMessage());
             }
         }
-
+        
         // Limpar RoiManager após processamento
         roiManager.reset();
         img.close();
