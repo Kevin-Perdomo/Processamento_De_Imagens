@@ -16,16 +16,9 @@ public class Connected_Components_ implements PlugInFilter {
         int width = ip.getWidth();
         int height = ip.getHeight();
 
-        // Verifica se a imagem é binária (só contém valores 0 e 255)
-        if (!isBinaryImage(ip)) {
-            IJ.error("A imagem não é binária!");
-            return; // Interrompe o processamento se não for binária
-        }
-
         // Criar uma cópia da imagem original para não modificar a original
-        ImagePlus clonedImg = IJ.createImage("Labeled Components", "8-bit", width, height, 1);
+        ImagePlus clonedImg = IJ.createImage("Labeled Components", "RGB", width, height, 1);
         ImageProcessor clonedIp = clonedImg.getProcessor();
-        clonedIp.copyBits(ip, 0, 0, Blitter.COPY); // Copiar o conteúdo da imagem original para a clonada
 
         // Matriz para armazenar os rótulos
         int[][] labels = new int[width][height];
@@ -77,36 +70,26 @@ public class Connected_Components_ implements PlugInFilter {
             }
         }
 
-        // Atribui tons de cinza diferentes para cada rótulo, com intervalo entre 30 e 220
-        Random rand = new Random(); // Gerar números aleatórios de forma mais variada
-        int[] colors = new int[label];
+        // Gerar cores aleatórias para os componentes
+        Random rand = new Random();
+        Color[] colors = new Color[label];
         for (int i = 1; i < label; i++) {
-            colors[i] = rand.nextInt(191) + 30; // Tons de cinza aleatórios entre 30 e 220
+            colors[i] = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)); // RGB aleatório
         }
 
-        // Cria a imagem rotulada
+        // Preencher a imagem com os componentes coloridos
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (labels[x][y] != 0) {
-                    clonedIp.putPixel(x, y, colors[labels[x][y]]);
+                    clonedIp.setColor(colors[labels[x][y]]);
+                    clonedIp.drawPixel(x, y);
                 }
             }
         }
 
-        // Mostrar a imagem rotulada como uma nova imagem
+        // Mostrar a imagem rotulada como uma nova imagem colorida
         clonedImg.show();
-    }
 
-    // Função para verificar se a imagem é binária (só contém valores 0 e 255)
-    private boolean isBinaryImage(ImageProcessor ip) {
-        for (int y = 0; y < ip.getHeight(); y++) {
-            for (int x = 0; x < ip.getWidth(); x++) {
-                int pixelValue = ip.getPixel(x, y);
-                 if (!(pixelValue == 0 || pixelValue == 255)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        IJ.log("Número total de componentes conexos: " + (label - 1));
     }
 }
