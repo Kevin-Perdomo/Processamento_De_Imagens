@@ -17,13 +17,13 @@ public class Connected_Components_ implements PlugInFilter {
         int width = ip.getWidth();
         int height = ip.getHeight();
 
-        // 🔎 Verificar se a imagem é binária
+        // Verificar se a imagem é binária
         if (!isBinary(ip)) {
             IJ.error("Erro", "A imagem de entrada precisa ser binária (valores 0 ou 255)");
             return;
         }
 
-        // 🎯 Exibir menu para o usuário escolher o tipo de saída
+        // Exibir menu para o usuário escolher o tipo de saída
         String[] options = {"Tons de Cinza", "Colorida (RGB)"};
         GenericDialog gd = new GenericDialog("Escolha o tipo de saída");
         gd.addChoice("Tipo de saída:", options, options[0]);
@@ -42,7 +42,7 @@ public class Connected_Components_ implements PlugInFilter {
 
         Queue<Point> queue = new LinkedList<>();
 
-        // 🔗 Executar o algoritmo BFS para rotular componentes conexos
+        // Executar o algoritmo BFS para rotular componentes conexos
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (ip.getPixel(x, y) == 255 && labels[x][y] == 0) {
@@ -54,9 +54,12 @@ public class Connected_Components_ implements PlugInFilter {
                         int px = p.x;
                         int py = p.y;
 
+                        // Relacao de vizinhança-4
                         int[][] neighbors = {
-                            {px + 1, py}, {px - 1, py},
-                            {px, py + 1}, {px, py - 1}
+                            {px + 1, py}, // Direita
+                            {px - 1, py}, // Esquerda
+                            {px, py + 1}, // Baixo
+                            {px, py - 1}  // Cima
                         };
 
                         for (int[] neighbor : neighbors) {
@@ -77,7 +80,7 @@ public class Connected_Components_ implements PlugInFilter {
             }
         }
 
-        // 🎨 Atribuir cores únicas para cada componente
+        // Atribuir cores únicas para cada componente
         if (useColor) {
             // Para evitar repetição, usamos um Set de cores já usadas
             Set<Color> usedColors = new HashSet<>();
@@ -104,7 +107,7 @@ public class Connected_Components_ implements PlugInFilter {
                 }
             }
         } else {
-            // 🖤 Tons de cinza (escala entre 50 e 255)
+            // Tons de cinza (escala entre 50 e 255)
             int step = 255 / label;
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
@@ -122,7 +125,7 @@ public class Connected_Components_ implements PlugInFilter {
         IJ.log("Número total de componentes conexos: " + (label - 1));
     }
 
-    // 📏 Função para verificar se a imagem é binária (0 ou 255)
+    // Função para verificar se a imagem é binária (0 ou 255)
     private boolean isBinary(ImageProcessor ip) {
         int width = ip.getWidth();
         int height = ip.getHeight();
@@ -130,7 +133,7 @@ public class Connected_Components_ implements PlugInFilter {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int pixel = ip.getPixel(x, y);
-                if (pixel != 0 && pixel != 255) {
+                if (!(pixel == 0 || pixel == 255)) {
                     return false;
                 }
             }
