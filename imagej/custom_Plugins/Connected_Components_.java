@@ -33,13 +33,14 @@ public class Connected_Components_ implements PlugInFilter {
 
         boolean useColor = gd.getNextChoice().equals("Colorida (RGB)");
 
-        // Criar uma cópia da imagem para rotulagem
+        // Criar uma cópia da imagem para rotulagem usando operador ternário
         ImagePlus clonedImg = IJ.createImage("Labeled Components", useColor ? "RGB" : "8-bit", width, height, 1);
         ImageProcessor clonedIp = clonedImg.getProcessor();
 
         int[][] labels = new int[width][height];
         int label = 1;
-
+        
+        // Estrutura de dados do tipo Fila (FIFO)
         Queue<Point> queue = new LinkedList<>();
 
         // Executar o algoritmo BFS para rotular componentes conexos
