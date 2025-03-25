@@ -61,6 +61,10 @@ public class Connected_Components_ implements PlugInFilter {
                             {px - 1, py}, // Esquerda
                             {px, py + 1}, // Baixo
                             {px, py - 1}  // Cima
+                            // {px + 1, py - 1}, // Diagonal superior direita
+                            // {px - 1, py - 1}, // Diagonal superior esquerda
+                            // {px + 1, py + 1}, // Diagonal inferior direita
+                            // {px - 1, py + 1}  // Diagonal inferior esquerda
                         };
 
                         for (int[] neighbor : neighbors) {
