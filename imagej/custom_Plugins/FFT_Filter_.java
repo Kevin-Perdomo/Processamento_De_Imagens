@@ -2,21 +2,21 @@ import ij.*;
 import ij.plugin.PlugIn;
 import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
+import ij.WindowManager;
 
 public class FFT_Filter_ implements PlugIn {
 
     @Override
     public void run(String arg) {
         try {
-            // Obtem imagem atual
+            // Obter a imagem original
             ImagePlus imp = IJ.getImage();
             if (imp == null || imp.getType() != ImagePlus.GRAY8) {
                 IJ.error("Por favor, abra uma imagem de 8 bits.");
                 return;
             }
 
-            // Pega entrada do usuário
+            // Interface de usuário
             GenericDialog gd = new GenericDialog("Filtro FFT");
             gd.addChoice("Tipo de filtro:", new String[]{"Passa-alta", "Passa-baixa"}, "Passa-baixa");
             gd.addNumericField("Raio do filtro:", 30, 0);
@@ -26,42 +26,61 @@ public class FFT_Filter_ implements PlugIn {
             String tipoFiltro = gd.getNextChoice();
             int raio = (int) gd.getNextNumber();
 
-            // Etapa 1: Aplica FFT
+            // Etapa 1 - Aplicar FFT
             IJ.log("1. Aplicando FFT...");
             IJ.run(imp, "FFT", "");
-            ImagePlus fft = IJ.getImage();
-            fft.setTitle("1 - FFT");
-            fft.show();
+            ImagePlus fftImage = IJ.getImage(); // FFT com 2 canais
+            fftImage.setTitle("1 - Imagem Pós-FFT");
+            fftImage.show(); // Exibe a imagem pós-FFT
+            IJ.log("Imagem após FFT exibida.");
 
-            // Etapa 2: Seleciona e preenche centro com base no tipo de filtro
+            // Duplicar a imagem após a FFT para garantir que a instância original não seja perdida
+            ImagePlus fftImageDup = fftImage.duplicate();
+            fftImageDup.setTitle("2 - Imagem Pós-FFT (sem filtro)");
+
+            // Etapa 2 - Aplicar filtro diretamente na imagem FFT duplicada
             IJ.log("2. Aplicando " + tipoFiltro + " com raio " + raio + "...");
-            int w = fft.getWidth();
-            int h = fft.getHeight();
+            WindowManager.setCurrentWindow(fftImageDup.getWindow());
+
+            // Exibe a imagem pós-FFT duplicada (sem o filtro ainda aplicado)
+            fftImageDup.updateAndDraw();  // Atualiza a imagem para garantir que ela esteja visível
+
+            // Fazendo as modificações do filtro na imagem FFT duplicada
+            int w = fftImageDup.getWidth();
+            int h = fftImageDup.getHeight();
             int cx = w / 2;
             int cy = h / 2;
 
-            // Desenha círculo no centro
             IJ.run("Select None");
             IJ.makeOval(cx - raio, cy - raio, 2 * raio, 2 * raio);
 
             if (tipoFiltro.equals("Passa-baixa")) {
-                // Preenche fora do círculo
-                IJ.run(fft, "Make Inverse", "");
+                IJ.run("Make Inverse", "");
             }
 
-            // Preenche pixels selecionados com preto
             IJ.setForegroundColor(0, 0, 0);
-            IJ.run(fft, "Fill", "");
+            IJ.run("Fill", "");
             IJ.run("Select None");
-            fft.updateAndDraw();
 
-            // Etapa 3: Aplica FFT inversa
-            IJ.log("3. Aplicando FFT inversa...");
-            IJ.run(fft, "Inverse FFT", "");
-            ImagePlus inversa = IJ.getImage();
-            inversa.setTitle("3 - Inversa");
-            inversa.show();
+            // Duplicando a imagem de FFT para manipulação sem perder a referência original
+            ImagePlus filteredFFT = fftImageDup.duplicate();
+            filteredFFT.setTitle("3 - FFT com filtro aplicado");
 
+            // Etapa 3 - Mostrar imagem com filtro aplicado
+            IJ.log("3. Imagem com filtro aplicado exibida.");
+            filteredFFT.show(); // Exibe a imagem com o filtro aplicado
+
+            // Etapa 4 - FFT Inversa
+            IJ.log("4. Aplicando FFT inversa...");
+            ImagePlus fftImageToInverse = WindowManager.getImage(fftImage.getID()); // Usando ID para pegar a imagem original
+            WindowManager.setCurrentWindow(fftImageToInverse.getWindow());
+            IJ.run("Inverse FFT", "");
+
+            ImagePlus reconstruida = IJ.getImage();
+            reconstruida.setTitle("5 - Imagem reconstruída");
+            reconstruida.show();
+
+            // Final
             IJ.log("Filtro FFT finalizado com sucesso.");
 
         } catch (Exception e) {
