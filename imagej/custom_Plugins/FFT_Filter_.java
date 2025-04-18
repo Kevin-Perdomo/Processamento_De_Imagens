@@ -27,12 +27,12 @@ public class FFT_Filter_ implements PlugIn {
             int raio = (int) gd.getNextNumber();
 
             // Etapa 1 - Aplicar FFT
-            IJ.log("1. Aplicando FFT...");
+            IJ.log("1. Aplicando Fast Fourier Transform...");
             IJ.run(imp, "FFT", "");
             ImagePlus fftImage = IJ.getImage(); // FFT com 2 canais
-            fftImage.setTitle("1 - Imagem Pós-FFT");
+            fftImage.setTitle("3 - FFT com filtro aplicado");
             fftImage.show(); // Exibe a imagem pós-FFT
-            IJ.log("Imagem após FFT exibida.");
+            IJ.log("Imagem após Fast Fourier Transform exibida.");
 
             // Duplicar a imagem após a FFT para garantir que a instância original não seja perdida
             ImagePlus fftImageDup = fftImage.duplicate();
@@ -64,20 +64,20 @@ public class FFT_Filter_ implements PlugIn {
 
             // Duplicando a imagem de FFT para manipulação sem perder a referência original
             ImagePlus filteredFFT = fftImageDup.duplicate();
-            filteredFFT.setTitle("3 - FFT com filtro aplicado");
+            filteredFFT.setTitle("1 - Imagem Pós-FFT");
 
             // Etapa 3 - Mostrar imagem com filtro aplicado
             IJ.log("3. Imagem com filtro aplicado exibida.");
             filteredFFT.show(); // Exibe a imagem com o filtro aplicado
 
             // Etapa 4 - FFT Inversa
-            IJ.log("4. Aplicando FFT inversa...");
+            IJ.log("4. Aplicando Inverse Fast Fourier Transform...");
             ImagePlus fftImageToInverse = WindowManager.getImage(fftImage.getID()); // Usando ID para pegar a imagem original
             WindowManager.setCurrentWindow(fftImageToInverse.getWindow());
             IJ.run("Inverse FFT", "");
 
             ImagePlus reconstruida = IJ.getImage();
-            reconstruida.setTitle("5 - Imagem reconstruída");
+            reconstruida.setTitle("4 - Imagem reconstruída");
             reconstruida.show();
 
             // Final
